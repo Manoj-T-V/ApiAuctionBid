@@ -1,0 +1,484 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Auction API",
+    "version": "1.0.0",
+    "description": "API documentation for Auction system"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5000/api"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/auctions/create": {
+      "post": {
+        "summary": "Create a new auction item",
+        "description": "Authenticated users can create a new auction item.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "description": "Data required to create a new auction item.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "startPrice": {
+                    "type": "number"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Auction item created successfully."
+          },
+          "401": {
+            "description": "Unauthorized (user must be authenticated)."
+          }
+        }
+      }
+    },
+    "/auctions": {
+      "get": {
+        "summary": "Get all auction items",
+        "description": "Retrieve a list of all auction items.",
+        "responses": {
+          "200": {
+            "description": "List of auction items retrieved successfully."
+          }
+        }
+      }
+    },
+    "/auctions/getmyauctions": {
+      "get": {
+        "summary": "Get all auctions created by the authenticated user",
+        "description": "Authenticated users can retrieve a list of their own auction items.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of user's auctions retrieved successfully."
+          },
+          "401": {
+            "description": "Unauthorized (user must be authenticated)."
+          }
+        }
+      }
+    },
+    "/auctions/{id}": {
+      "get": {
+        "summary": "Get a single auction item by ID",
+        "description": "Retrieve the details of a specific auction item by its ID.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "description": "ID of the auction item to retrieve.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Auction item retrieved successfully."
+          },
+          "404": {
+            "description": "Auction item not found."
+          }
+        }
+      },
+      "put": {
+        "summary": "Update an auction item",
+        "description": "Authenticated users can update an existing auction item by its ID.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "description": "ID of the auction item to update.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "description": "Data to update the auction item.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "startPrice": {
+                    "type": "number"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Auction item updated successfully."
+          },
+          "401": {
+            "description": "Unauthorized (user must be authenticated)."
+          },
+          "404": {
+            "description": "Auction item not found."
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete an auction item",
+        "description": "Authenticated users can delete an auction item by its ID.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "description": "ID of the auction item to delete.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Auction item deleted successfully."
+          },
+          "401": {
+            "description": "Unauthorized (user must be authenticated)."
+          },
+          "404": {
+            "description": "Auction item not found."
+          }
+        }
+      }
+    },
+    "/register": {
+      "post": {
+        "summary": "Register a new user",
+        "tags": [
+          "Authentication"
+        ],
+        "requestBody": {
+          "description": "User registration data",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User successfully registered"
+          },
+          "400": {
+            "description": "Invalid input data"
+          }
+        }
+      }
+    },
+    "/login": {
+      "post": {
+        "summary": "Login a user",
+        "tags": [
+          "Authentication"
+        ],
+        "requestBody": {
+          "description": "User login data",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful login, returns token"
+          },
+          "401": {
+            "description": "Invalid credentials"
+          }
+        }
+      }
+    },
+    "/check": {
+      "get": {
+        "summary": "Check if a user session is valid",
+        "tags": [
+          "Authentication"
+        ],
+        "responses": {
+          "200": {
+            "description": "Session is valid"
+          },
+          "401": {
+            "description": "Not authenticated"
+          }
+        }
+      }
+    },
+    "/signingoogle": {
+      "post": {
+        "summary": "Sign in using Google account",
+        "tags": [
+          "Authentication"
+        ],
+        "responses": {
+          "200": {
+            "description": "Google sign-in successful"
+          },
+          "401": {
+            "description": "Google sign-in failed"
+          }
+        }
+      }
+    },
+    "/profile": {
+      "get": {
+        "summary": "Get user profile information",
+        "tags": [
+          "Authentication"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved user profile"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/google": {
+      "get": {
+        "summary": "Start Google authentication",
+        "tags": [
+          "Authentication"
+        ],
+        "responses": {
+          "302": {
+            "description": "Redirect to Google login page"
+          }
+        }
+      }
+    },
+    "/google/callback": {
+      "get": {
+        "summary": "Callback after Google authentication",
+        "tags": [
+          "Authentication"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Google authentication, redirect to tasks page"
+          },
+          "401": {
+            "description": "Authentication failed"
+          }
+        }
+      }
+    },
+    "/logout": {
+      "get": {
+        "summary": "Logout the current user",
+        "tags": [
+          "Authentication"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully logged out"
+          }
+        }
+      }
+    },
+    "/current_user": {
+      "get": {
+        "summary": "Get the current authenticated user",
+        "tags": [
+          "Authentication"
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns the authenticated user"
+          },
+          "401": {
+            "description": "Not authenticated"
+          }
+        }
+      }
+    },
+    "/bids/{auctionItemId}/bid": {
+      "post": {
+        "summary": "Place a bid on an auction item",
+        "description": "Authenticated users can place a bid on a specific auction item.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "auctionItemId",
+            "required": true,
+            "description": "ID of the auction item to place a bid on.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Bid placed successfully."
+          },
+          "401": {
+            "description": "Unauthorized (user must be authenticated)."
+          }
+        }
+      }
+    },
+    "/bids/{auctionItemId}/allbids": {
+      "get": {
+        "summary": "Get all bids for an auction item",
+        "description": "Retrieves all bids placed for a specific auction item.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "auctionItemId",
+            "required": true,
+            "description": "ID of the auction item to retrieve bids for.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of bids retrieved successfully."
+          }
+        }
+      }
+    },
+    "/bids/mybids": {
+      "get": {
+        "summary": "Get all bids of the authenticated user",
+        "description": "Retrieve all bids placed by the currently authenticated user.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of user's bids retrieved successfully."
+          },
+          "401": {
+            "description": "Unauthorized (user must be authenticated)."
+          }
+        }
+      }
+    },
+    "/bids/notifications": {
+      "get": {
+        "summary": "Get outbid notifications for the authenticated user",
+        "description": "Retrieve notifications for the authenticated user when they have been outbid.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of outbid notifications retrieved successfully."
+          },
+          "401": {
+            "description": "Unauthorized (user must be authenticated)."
+          }
+        }
+      }
+    }
+  },
+  "tags": []
+}
