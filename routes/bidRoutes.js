@@ -12,6 +12,7 @@ router.get('/:auctionItemId/allbids', controller.getBidsForAuctionItem);
 
 router.get('/mybids',authMiddleware, controller.getBidsofMine);
 
+//get notifications of outbids
 router.get('/notifications',authMiddleware, controller.getNotifications);
 
 export default router;

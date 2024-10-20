@@ -44,6 +44,7 @@ app.use((req, res, next) => {
   console.log('Request body:', req.body);
   next();
 });
+
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
