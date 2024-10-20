@@ -11,7 +11,7 @@ const getProfile = async (req, res) => {
     const auctions = await AuctionItem.find({ createdBy: userId });
 
     // Fetch bids made by the user
-    const bids = await Bid.find({ bidder: userId }).populate('AuctionItem'); // Assuming bids are linked to auctions
+    const bids = await Bid.find({ bidder: userId }).populate('auctionItem'); // Assuming bids are linked to auctions
 
     res.json({
       auctions,

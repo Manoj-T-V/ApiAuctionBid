@@ -10,6 +10,11 @@ const auctionItemSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  highestBidder: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: false,
+  },
   startingBid: {
     type: Number,
     required: true,

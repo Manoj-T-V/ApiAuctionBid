@@ -1,5 +1,7 @@
 import Bid from '../models/Bid.js';
 import AuctionItem from '../models/AuctionItem.js';
+import Notification from '../models/Notification.js'; 
+import User from '../models/User.js'
 import nodemailer from 'nodemailer'; 
 import { io } from '../index.js'
 
@@ -7,25 +9,32 @@ import { io } from '../index.js'
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: '',
-    pass: '',
+    user: 'manoj.venkateshgowda@campusuvce.in',
+    pass: 'Bhagvanp@914',
   },
 });
 
 // Function to send outbid notification email
 const sendOutbidEmail = async (email, auctionItem, newBidAmount) => {
   const mailOptions = {
-    from: '',
+    from: 'manoj.venkateshgowda@campusuvce.in',
     to: email,
     subject: 'You have been outbid!',
     text: `You have been outbid on auction item: ${auctionItem.title}. The new highest bid is $${newBidAmount}. Place a new bid to win the auction!`,
   };
 
+  try{
   await transporter.sendMail(mailOptions);
+  }
+  catch(err){
+    console.log(err);
+  }
 };
 
 // Place a new bid
 const placeBid = async (req, res) => {
+    debugger;
+    console.log(req);
   const { amount } = req.body;
   const { auctionItemId } = req.params;
 
@@ -54,19 +63,20 @@ const placeBid = async (req, res) => {
     auctionItem.highestBidder = req.user.id; // Update highest bidder
     auctionItem.bids.push(bid._id);
     await auctionItem.save();
-
-    // Real-time notification via WebSocket
-    // Notify all users watching this auction item
-    io.to(auctionItemId).emit('newBid', {
-      auctionItemId,
-      newHighestBid: amount,
-      bidder: req.user.id,
-    });
-
+ 
     // Notify the previous highest bidder via email (if there was one)
     if (previousHighestBidder && previousHighestBidder !== req.user.id) {
+        const previousUser = await User.findById(previousHighestBidder);
+        const message = `You have been outbid on auction item "${auctionItem.title}". The new highest bid is $${amount}.`;
+        const notification = new Notification({
+            user: previousHighestBidder, 
+            message: message,    
+            email: previousUser.email,
+        });
+        console.log(notification);
+        await notification.save();
       const previousBidderEmail = previousHighestBidder.email; // Assuming email is part of the user model
-      await sendOutbidEmail(previousBidderEmail, auctionItem, amount);
+      //await sendOutbidEmail(previousBidderEmail, auctionItem, amount);
     }
 
     res.status(201).json(bid);
@@ -100,6 +110,16 @@ const getBidsofMine = async (req, res) => {
     }
 };
 
+const getNotifications = async (req, res) => {
+    try {
+        const notifications = await Notification.find({ user: req.user.id }).sort({ createdAt: -1 });
+        res.json(notifications);
+      } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Error fetching notifications' });
+      }
+};
+
   
   
 
@@ -107,4 +127,5 @@ export default {
   placeBid,
   getBidsForAuctionItem,
   getBidsofMine,
+  getNotifications,
 };

@@ -95,7 +95,7 @@ const signingoogle = async(req, res) =>{
       await user.save();
 
       // Generate a JWT token for the new user
-      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '3h' });
       return res.status(201).json({ success: true, token });
     }
   }
