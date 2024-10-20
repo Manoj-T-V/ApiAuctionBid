@@ -5,45 +5,177 @@ import authController from '../controllers/authController.js';
 import authMiddleware from '../middleware/authMiddleware.js';
 import getProfile from '../controllers/getProfileController.js';
 
+/**
+ * @swagger
+ * /register:
+ *   post:
+ *     summary: Register a new user
+ *     tags:
+ *       - Authentication
+ *     requestBody:
+ *       description: User registration data
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: User successfully registered
+ *       400:
+ *         description: Invalid input data
+ */
 router.post('/register', authController.register);
+
+/**
+ * @swagger
+ * /login:
+ *   post:
+ *     summary: Login a user
+ *     tags:
+ *       - Authentication
+ *     requestBody:
+ *       description: User login data
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Successful login, returns token
+ *       401:
+ *         description: Invalid credentials
+ */
 router.post('/login', authController.login);
+
+/**
+ * @swagger
+ * /check:
+ *   get:
+ *     summary: Check if a user session is valid
+ *     tags:
+ *       - Authentication
+ *     responses:
+ *       200:
+ *         description: Session is valid
+ *       401:
+ *         description: Not authenticated
+ */
 router.get('/check', authController.checksession);
-router.post('/signingoogle', authController.signingoogle)
+
+/**
+ * @swagger
+ * /signingoogle:
+ *   post:
+ *     summary: Sign in using Google account
+ *     tags:
+ *       - Authentication
+ *     responses:
+ *       200:
+ *         description: Google sign-in successful
+ *       401:
+ *         description: Google sign-in failed
+ */
+router.post('/signingoogle', authController.signingoogle);
+
+/**
+ * @swagger
+ * /profile:
+ *   get:
+ *     summary: Get user profile information
+ *     tags:
+ *       - Authentication
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved user profile
+ *       401:
+ *         description: Unauthorized
+ */
 router.get('/profile', authMiddleware, getProfile);
-// todo route for Google login 
-// Route to start Google authentication
+
+/**
+ * @swagger
+ * /google:
+ *   get:
+ *     summary: Start Google authentication
+ *     tags:
+ *       - Authentication
+ *     responses:
+ *       302:
+ *         description: Redirect to Google login page
+ */
 router.get('/google', passport.authenticate('google', {
     scope: ['profile', 'email'],
-  }));
-  
-//   // Callback route after Google authentication
-//   router.get('/google/callback', 
-//     passport.authenticate('google', { session: false }),
-//     (req, res) => {
-//         console.log("success");
-//       // Successful authentication, redirect home.
-//       res.redirect('/');
-//     }
-//   );
+  })
+);
 
-  // Callback route after Google authentication
+/**
+ * @swagger
+ * /google/callback:
+ *   get:
+ *     summary: Callback after Google authentication
+ *     tags:
+ *       - Authentication
+ *     responses:
+ *       200:
+ *         description: Successful Google authentication, redirect to tasks page
+ *       401:
+ *         description: Authentication failed
+ */
 router.get('/google/callback', 
-    passport.authenticate('google', { session: false }), // No session handling here, use JWT or similar
+    passport.authenticate('google', { session: false }), 
     (req, res) => {
-        // Successful authentication, generate a token and redirect
         const token = jwt.sign({ id: req.user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-        res.redirect(`http://localhost:3000/tasks?token=${token}`); // Redirect with token as query parameter
+        res.redirect(`http://localhost:3000/tasks?token=${token}`);
     }
 );
-  
-  // Logout route
-  router.get('/logout', (req, res) => {
+
+/**
+ * @swagger
+ * /logout:
+ *   get:
+ *     summary: Logout the current user
+ *     tags:
+ *       - Authentication
+ *     responses:
+ *       200:
+ *         description: Successfully logged out
+ */
+router.get('/logout', (req, res) => {
     req.logout();
     res.redirect('/');
-  });
-  
-  // Check if authenticated
-  router.get('/current_user', (req, res) => {
+});
+
+/**
+ * @swagger
+ * /current_user:
+ *   get:
+ *     summary: Get the current authenticated user
+ *     tags:
+ *       - Authentication
+ *     responses:
+ *       200:
+ *         description: Returns the authenticated user
+ *       401:
+ *         description: Not authenticated
+ */
+router.get('/current_user', (req, res) => {
     res.json(req.user);
-  });
+});
+
 export default router;

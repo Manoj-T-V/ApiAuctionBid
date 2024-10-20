@@ -11,11 +11,45 @@ import { config } from "dotenv";
 import './config/passport.js';
 import http from 'http'; 
 import { Server } from 'socket.io'; 
+import swaggerJsdoc from'swagger-jsdoc';
+import swaggerUi from 'swagger-ui-express';
 config(); //load env variables
 const app = express();
 
 // Create HTTP server
 const server = http.createServer(app);
+
+const swaggerOptions = {
+  swaggerDefinition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'Auction API',
+      version: '1.0.0',
+      description: 'API documentation for Auction system',
+    },
+    servers: [
+      {
+        url: 'http://localhost:5000/api', // replace with your API base URL
+      },
+    ],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT', 
+        },
+      },
+    },
+    security: [
+      {
+        bearerAuth: [], 
+      },
+    ],
+  },
+  apis: ['./routes/*.js'], 
+};
+const swaggerSpec = swaggerJsdoc(swaggerOptions);
 
 // Initialize Socket.IO
 export const io = new Server(server);
@@ -35,8 +69,12 @@ app.listen(5000, () => {
 });
 app.use(express.json());
 app.use(cors());
-
-
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+// Serve the Swagger JSON specification
+app.get('/swagger.json', (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.send(swaggerSpec);
+});
 app.use('/api/auth', auth);
 app.use('/api/auctions', auctionRoutes);
 app.use('/api/bids', bidRoutes);
