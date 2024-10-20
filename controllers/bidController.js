@@ -9,15 +9,15 @@ import { io } from '../index.js'
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'manoj.venkateshgowda@campusuvce.in',
-    pass: 'Bhagvanp@914',
+    user: '',
+    pass: '',
   },
 });
 
 // Function to send outbid notification email
 const sendOutbidEmail = async (email, auctionItem, newBidAmount) => {
   const mailOptions = {
-    from: 'manoj.venkateshgowda@campusuvce.in',
+    from: '',
     to: email,
     subject: 'You have been outbid!',
     text: `You have been outbid on auction item: ${auctionItem.title}. The new highest bid is $${newBidAmount}. Place a new bid to win the auction!`,
