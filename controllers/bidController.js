@@ -75,7 +75,6 @@ const placeBid = async (req, res) => {
         });
         console.log(notification);
         await notification.save();
-      const previousBidderEmail = previousHighestBidder.email; // Assuming email is part of the user model
       //await sendOutbidEmail(previousBidderEmail, auctionItem, amount);
     }
 
